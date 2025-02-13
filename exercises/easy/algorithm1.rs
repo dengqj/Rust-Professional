@@ -22,6 +22,7 @@ impl<T> Node<T> {
         }
     }
 }
+
 #[derive(Debug)]
 struct LinkedList<T> {
     length: u32,
@@ -69,17 +70,42 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
-        }
-	}
-}
+    pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self
+    where
+        T: Ord,
+    {
+        let mut merged_list = LinkedList::new();
+        let mut current_a = list_a.start;
+        let mut current_b = list_b.start;
 
+        while let (Some(node_a), Some(node_b)) = (current_a, current_b) {
+            let node_a_val = unsafe { &(*node_a.as_ptr()).val };
+            let node_b_val = unsafe { &(*node_b.as_ptr()).val };
+
+            if node_a_val <= node_b_val {
+                merged_list.add(node_a_val.clone());
+                current_a = unsafe { (*node_a.as_ptr()).next };
+            } else {
+                merged_list.add(node_b_val.clone());
+                current_b = unsafe { (*node_b.as_ptr()).next };
+            }
+        }
+
+        while let Some(node_a) = current_a {
+            let node_a_val = unsafe { &(*node_a.as_ptr()).val };
+            merged_list.add(node_a_val.clone());
+            current_a = unsafe { (*node_a.as_ptr()).next };
+        }
+
+        while let Some(node_b) = current_b {
+            let node_b_val = unsafe { &(*node_b.as_ptr()).val };
+            merged_list.add(node_b_val.clone());
+            current_b = unsafe { (*node_b.as_ptr()).next };
+        }
+
+        merged_list
+    }
+}
 impl<T> Display for LinkedList<T>
 where
     T: Display,
