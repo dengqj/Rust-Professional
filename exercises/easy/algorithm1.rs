@@ -8,6 +8,7 @@ use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
 use std::vec::*;
 
+// Node structure to hold a value and a pointer to the next node
 #[derive(Debug)]
 struct Node<T> {
     val: T,
@@ -15,6 +16,7 @@ struct Node<T> {
 }
 
 impl<T> Node<T> {
+    // Creates a new node with the given value
     fn new(t: T) -> Node<T> {
         Node {
             val: t,
@@ -23,6 +25,7 @@ impl<T> Node<T> {
     }
 }
 
+// LinkedList structure to manage a list of nodes
 #[derive(Debug)]
 struct LinkedList<T> {
     length: u32,
@@ -31,12 +34,14 @@ struct LinkedList<T> {
 }
 
 impl<T> Default for LinkedList<T> {
+    // Default implementation for LinkedList
     fn default() -> Self {
         Self::new()
     }
 }
 
 impl<T> LinkedList<T> {
+    // Creates a new empty LinkedList
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -45,6 +50,7 @@ impl<T> LinkedList<T> {
         }
     }
 
+    // Adds a new node with the given value to the end of the list
     pub fn add(&mut self, obj: T) {
         let mut node = Box::new(Node::new(obj));
         node.next = None;
@@ -57,10 +63,12 @@ impl<T> LinkedList<T> {
         self.length += 1;
     }
 
+    // Retrieves the value at the given index
     pub fn get(&mut self, index: i32) -> Option<&T> {
         self.get_ith_node(self.start, index)
     }
 
+    // Helper function to retrieve the node at the given index
     fn get_ith_node(&mut self, node: Option<NonNull<Node<T>>>, index: i32) -> Option<&T> {
         match node {
             None => None,
@@ -70,14 +78,16 @@ impl<T> LinkedList<T> {
             },
         }
     }
+
     pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self
     where
-        T: Ord,
+        T: Ord + Clone,
     {
         let mut merged_list = LinkedList::new();
         let mut current_a = list_a.start;
         let mut current_b = list_b.start;
 
+        // Merge the two lists by comparing values and adding the smaller value to the merged list
         while let (Some(node_a), Some(node_b)) = (current_a, current_b) {
             let node_a_val = unsafe { &(*node_a.as_ptr()).val };
             let node_b_val = unsafe { &(*node_b.as_ptr()).val };
@@ -91,12 +101,14 @@ impl<T> LinkedList<T> {
             }
         }
 
+        // Add any remaining nodes from list_a to the merged list
         while let Some(node_a) = current_a {
             let node_a_val = unsafe { &(*node_a.as_ptr()).val };
             merged_list.add(node_a_val.clone());
             current_a = unsafe { (*node_a.as_ptr()).next };
         }
 
+        // Add any remaining nodes from list_b to the merged list
         while let Some(node_b) = current_b {
             let node_b_val = unsafe { &(*node_b.as_ptr()).val };
             merged_list.add(node_b_val.clone());
@@ -106,6 +118,8 @@ impl<T> LinkedList<T> {
         merged_list
     }
 }
+
+// Implementation of Display trait for LinkedList to print the list
 impl<T> Display for LinkedList<T>
 where
     T: Display,
@@ -118,6 +132,7 @@ where
     }
 }
 
+// Implementation of Display trait for Node to print the node value
 impl<T> Display for Node<T>
 where
     T: Display,
@@ -161,7 +176,7 @@ mod tests {
 		let vec_a = vec![1,3,5,7];
 		let vec_b = vec![2,4,6,8];
 		let target_vec = vec![1,2,3,4,5,6,7,8];
-		
+
 		for i in 0..vec_a.len(){
 			list_a.add(vec_a[i]);
 		}
@@ -197,3 +212,4 @@ mod tests {
 		}
 	}
 }
+
