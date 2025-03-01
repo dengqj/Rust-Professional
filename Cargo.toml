@@ -14,8 +14,3 @@ log4rs = "1.0"
 
 
 
-[workspace]
-members = [
-    ".",
-    "exercises/hard/solutiont3",
-]
