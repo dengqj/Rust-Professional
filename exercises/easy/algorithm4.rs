@@ -41,7 +41,7 @@ where
 
 impl<T> BinarySearchTree<T>
 where
-    T: Ord,
+    T: Ord+Clone,
 {
 
     fn new() -> Self {
@@ -50,13 +50,26 @@ where
 
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
-        //TODO
+        let new_node = Box::new(TreeNode::new(value.clone()));
+        match self.root {
+            Some(ref mut node) => node.insert(value),
+            None => self.root = Some(new_node),
+        }
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
-        //TODO
-        true
+        fn search_node<T: Ord>(node: &Option<Box<TreeNode<T>>>, value: T) -> bool {
+            match node {
+                Some(ref n) => match value.cmp(&n.value) {
+                    Ordering::Less => search_node(&n.left, value),
+                    Ordering::Greater => search_node(&n.right, value),
+                    Ordering::Equal => true,
+                },
+                None => false,
+            }
+        }
+        search_node(&self.root, value)
     }
 }
 
@@ -66,7 +79,17 @@ where
 {
     // Insert a node into the tree
     fn insert(&mut self, value: T) {
-        //TODO
+        match value.cmp(&self.value) {
+            Ordering::Less => match self.left {
+                Some(ref mut left) => left.insert(value),
+                None => self.left = Some(Box::new(TreeNode::new(value))),
+            },
+            Ordering::Greater => match self.right {
+                Some(ref mut right) => right.insert(value),
+                None => self.right = Some(Box::new(TreeNode::new(value))),
+            },
+            Ordering::Equal => (),
+        }
     }
 }
 

@@ -12,10 +12,41 @@
 */
 
 use std::fmt::{self, Display, Formatter};
+use std::collections::HashMap;
 
 pub fn are_anagrams(s1: String, s2: String) -> bool {
-    // TODO: Implement the logic to check if two strings are anagrams
-    false // Placeholder return value
+    // Normalize the strings by removing non-alphabetical characters and converting to lowercase
+    let normalize = |s: &String| -> String {
+        s.chars()
+            .filter(|c| c.is_alphabetic())
+            .map(|c| c.to_lowercase().next().unwrap())
+            .collect()
+    };
+
+    let normalized_s1 = normalize(&s1);
+    let normalized_s2 = normalize(&s2);
+
+    // Check if the lengths are the same
+    if normalized_s1.len() != normalized_s2.len() {
+        return false;
+    }
+
+    // Count the frequency of each character
+    let mut char_count = HashMap::new();
+
+    for c in normalized_s1.chars() {
+        *char_count.entry(c).or_insert(0) += 1;
+    }
+
+    for c in normalized_s2.chars() {
+        let count = char_count.entry(c).or_insert(0);
+        if *count == 0 {
+            return false;
+        }
+        *count -= 1;
+    }
+
+    true
 }
 
 #[cfg(test)]

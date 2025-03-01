@@ -12,7 +12,41 @@
 use std::fmt::{self, Display, Formatter};
 
 pub fn rotate_matrix_90_degrees(matrix: &mut Vec<Vec<i32>>) {
-    // TODO: Implement the logic to rotate the matrix 90 degrees in place
+    let n = matrix.len();
+    if n == 0 { return; }
+    let m = matrix[0].len();
+    if m == 0 { return; }
+
+    // Step 1: Convert to square matrix by padding with zeros
+    let max_dim = n.max(m);
+    for row in matrix.iter_mut() {
+        row.resize(max_dim, 0);
+    }
+    while matrix.len() < max_dim {
+        matrix.push(vec![0; max_dim]);
+    }
+
+    // Step 2: Rotate the square matrix
+    for i in 0..max_dim / 2 {
+        for j in 0..(max_dim + 1) / 2 {
+            let temp = matrix[i][j];
+            matrix[i][j] = matrix[max_dim - 1 - j][i];
+            matrix[max_dim - 1 - j][i] = matrix[max_dim - 1 - i][max_dim - 1 - j];
+            matrix[max_dim - 1 - i][max_dim - 1 - j] = matrix[j][max_dim - 1 - i];
+            matrix[j][max_dim - 1 - i] = temp;
+        }
+    }
+
+    // Step 3: Restore the original shape
+    if n < m {
+        // Remove extra columns
+        for row in matrix.iter_mut() {
+            row.truncate(n);
+        }
+    } else if m < n {
+        // Remove extra rows
+        matrix.truncate(m);
+    }
 }
 
 #[cfg(test)]
