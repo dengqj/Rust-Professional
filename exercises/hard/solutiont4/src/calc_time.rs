@@ -12,10 +12,12 @@ pub fn time_info(time: &str) -> String {
 
     fn days_in_year(y: i32, m: i32, d: i32) -> i32 {
         let days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-        let mut total = d;
-        for i in 0..(m - 1) as usize {
-            total += if i == 1 && is_leap_year(y) { 29 } else { days[i] };
-        }
+        let mut total: i32 = d;
+        // 修改部分：使用迭代器和enumerate()，避免用循环变量 i 索引 days
+        for (i, &day_count) in days.iter().enumerate().take((m - 1) as usize) {
+            total += if i == 1 && is_leap_year(y) {
+                29
+           } else { day_count };       }
         total
     }
 
@@ -24,7 +26,6 @@ pub fn time_info(time: &str) -> String {
         let m = if m < 3 { m + 12 } else { m };
         let y = if m > 12 { y - 1 } else { y };
         let k = d;
-        let m = m;
         let d = y / 100;
         let y = y % 100;
         let h = (k + (13 * (m + 1)) / 5 + y + y / 4 + d / 4 + 5 * d) % 7;
